@@ -1,7 +1,6 @@
 import { StyleSheet, Text, View, Image, TouchableOpacity,Button,Alert,TextInput,StatusBar} from 'react-native';
 import React,{useState, FC} from 'react';
-import StudentAddPage from './Components/StudentAddPage';
-import StudentListRow from './Components/StudentListRow';
+import StudentList from './Components/StudentList';
 
 
 
@@ -9,7 +8,7 @@ export default function App() {
  
   return (
     <View style={styles.container}>
-      <StudentListRow name="Oran Bourak" id="12312412" imgUrl='https://www.youtube.com'/>
+      <StudentList />
 
     </View>
   );

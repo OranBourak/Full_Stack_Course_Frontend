@@ -17,7 +17,7 @@ export default function StudentPage() {
 
   return (
     <View style={styles.container}>
-      <Image source = {require('../assets/Avatar.jpg')} style= {styles.avatar} />
+      <Image source = {require("../assets/Avatar.jpg")} style= {styles.avatar} />
       <TextInput 
         style={styles.input}
         onChangeText={onChangeName}
