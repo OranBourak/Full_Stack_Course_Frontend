@@ -1,11 +1,16 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity,Button,Alert,TextInput,StatusBar} from 'react-native';
+import React,{useState, FC} from 'react';
+import StudentAddPage from './Components/StudentAddPage';
+import StudentListRow from './Components/StudentListRow';
+
+
 
 export default function App() {
+ 
   return (
     <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
+      <StudentListRow name="Oran Bourak" id="12312412" imgUrl='https://www.youtube.com'/>
+
     </View>
   );
 }
@@ -13,8 +18,7 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: 'column',
+    marginTop: StatusBar.currentHeight,
   },
 });
