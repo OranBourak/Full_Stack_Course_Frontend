@@ -1,19 +1,32 @@
 import { FC, useEffect, useState } from 'react';
-import { FlatList, Text, StyleSheet } from 'react-native';
+import { FlatList, Text, StyleSheet,Button } from 'react-native';
 import StudentListRow from './StudentListRow';
 
 import StudentModel, {Student} from '../Models/StudentModel';
 
-const StudentList: FC = () => {
+const StudentListPage: FC<{navigation:any}> = ({navigation}) => {
 
     const [data, setData] = useState<Student[]>([]);
 
     const onItemSelected = (id:string)=>{
         console.log('Item Selected, ID:'+ id);
+        navigation.navigate('StudentDetailsPage', {id:id});
     }
 
     useEffect(()=>{
-        setData(StudentModel.getAllStudents());
+        const unsubscribe = navigation.addListener('focus', () => {
+        setData([...StudentModel.getAllStudents()]);
+        })
+    },[navigation])
+    useEffect(()=>{
+        navigation.setOptions({
+            headerRight: () => (
+                <Button
+                onPress={() => navigation.navigate('AddStudentPage')}
+                title="ADD"
+                />
+                ),
+        });
     },[])
 
     return (
@@ -39,4 +52,4 @@ const styles = StyleSheet.create({
     }
 })
 
-export default StudentList;
+export default StudentListPage;

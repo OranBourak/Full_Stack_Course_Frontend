@@ -1,7 +1,8 @@
 import { StyleSheet, Text, View, Image, TouchableOpacity,Button,Alert,TextInput,StatusBar} from 'react-native';
-import React,{useState} from 'react';
+import React,{FC, useState} from 'react';
+import StudentModel, { Student } from '../Models/StudentModel';
 
-export default function StudentPage() {
+const StudentAddPage:FC<{navigation: any}> = ({navigation})=>{
 
   const [name, onChangeName] = useState("");
   const [id, onChangeId] = useState("");
@@ -9,9 +10,18 @@ export default function StudentPage() {
 
   const onCancel = () => {
     console.log('Cancel');
+    navigation.navigate('StudentListPage')
   }
   const onSave = () => {
     console.log('Save');
+    const student:Student = {
+      name: name,
+      id: id,
+      imgUrl: address,
+    }
+    StudentModel.addStudent(student);
+    navigation.navigate('StudentListPage')
+
   }
   
 
@@ -27,22 +37,22 @@ export default function StudentPage() {
       <TextInput 
         style={styles.input}
         onChangeText={onChangeId}
-        value={name}
+        value={id}
         placeholder='Enter your ID number'
       />
       <TextInput 
         style={styles.input}
         onChangeText={onChangeAddress}
-        value={name}
+        value={address}
         placeholder='Enter your address'
       />
       <View style ={styles.buttons}>
         <TouchableOpacity style={styles.button} onPress={onCancel}>
-           <Text style={styles.buttonText}>OK</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={onSave}>
           <Text style={styles.buttonText}>CANCEL</Text>
        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={onSave}>
+           <Text style={styles.buttonText}>SAVE</Text>
+        </TouchableOpacity>
       </View>
 
     </View>
@@ -85,3 +95,5 @@ const styles = StyleSheet.create({
  
     }
 });
+
+export default StudentAddPage;
