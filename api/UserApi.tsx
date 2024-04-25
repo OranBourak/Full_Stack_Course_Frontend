@@ -10,6 +10,15 @@ const uploadImage = async (body: FormData) => {
     });
 };
 
+const userLogin = async (userDetails:any) => {
+    try {
+      const response = await apiClient.post('/auth/login', userDetails);
+      return response; 
+    } catch (error) {
+      console.error('Failed to login:', error);
+      return null; // Handle errors appropriately
+    }
+  }
 
 // Function to add a user
 const addUser = async (userDetails:any) => {
@@ -45,5 +54,6 @@ const getAllUsers = async () => {
 export default {
     getAllUsers,
     addUser,
-    uploadImage
+    uploadImage,
+    userLogin
 }
