@@ -14,6 +14,7 @@ import {
   Alert,
   Dimensions,
   ScrollView,
+  KeyboardAvoidingView,
 } from "react-native";
 
 interface UserData {
@@ -166,8 +167,10 @@ const EditProfilePage = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    marginTop: -100,
     alignItems: "center",
-    marginTop: 50,
+    width: "100%",
+    justifyContent: "center",
   },
   skeletonContainer: {
     flex: 1,
@@ -210,6 +213,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#fff",
     fontSize: 18,
+    textAlign: "center",
   },
   avatarContainer: {
     marginTop: 0,

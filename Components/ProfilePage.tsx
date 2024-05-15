@@ -122,13 +122,14 @@ const styles = StyleSheet.create({
   },
   profileContainer: {
     alignItems: "center",
-    marginTop: 0,
+    marginBottom: 20,
   },
   profilePhoto: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: 150,
+    height: 150,
+    borderRadius: 100,
     marginTop: 50,
+    marginBottom: 10,
   },
   nameText: {
     fontSize: 20,
