@@ -1,5 +1,6 @@
 {
   "expo": {
+    "scheme": "com.oran.fullstackcourse",
     "name": "sce_front",
     "slug": "sce_front",
     "version": "1.0.0",
@@ -22,7 +23,13 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.oran.fullstackcourse"
+      "package": "com.oran.fullstackcourse",
+      "scheme": "scefront",
+      "config": {
+        "googleSignIn": {
+          "certificateHash": "2C:C6:9A:B1:7A:4A:E4:ED:67:81:64:97:7B:8D:81:79:D1:73:25:C5"
+        }
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"

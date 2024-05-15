@@ -1,59 +1,83 @@
-import apiClient from "./ClientApi";
-
+import clientApi from "./ClientApi";
 
 // Function to upload an image
 const uploadImage = async (body: FormData) => {
-    return apiClient.post('/file/file', body, {
-        headers: {
-            'Content-Type': 'multipart/form-data',
-        },
-    });
+  return clientApi.post("/file/upload", body, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
 };
 
-const userLogin = async (userDetails:any) => {
-    try {
-      const response = await apiClient.post('/auth/login', userDetails);
-      return response; 
-    } catch (error) {
-      console.error('Failed to login:', error);
-      return null; // Handle errors appropriately
-    }
+const updateImage = async (body: FormData, userImageUri: string) => {
+  const deleteResponse = await clientApi.delete(`/file/remove`, {
+    data: { url: userImageUri },
+  });
+  console.log(
+    "delete response (printed from updateImage function)",
+    deleteResponse
+  );
+  if (deleteResponse.status === 200) {
+    const updateResponse = await clientApi.post("/file/update", body, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return updateResponse;
   }
+  return deleteResponse; // Return the delete response if delete was not successful
+};
 
-// Function to add a user
-const addUser = async (userDetails:any) => {
+const userLogin = async (userDetails: any) => {
   try {
-    const response = await apiClient.post('/auth/register', userDetails);
-    return response; 
+    const response = await clientApi.post("/auth/login", userDetails);
+    return response;
   } catch (error) {
-    console.error('Failed to add user:', error);
+    console.error("Failed to login:", error);
     return null; // Handle errors appropriately
   }
 };
 
+// Function to add a user
+const addUser = async (userDetails: any) => {
+  try {
+    const response = await clientApi.post("/auth/register", userDetails);
+    return response;
+  } catch (error) {
+    console.error("Failed to add user:", error);
+    return null; // Handle errors appropriately
+  }
+};
 
-// Function to get all users
-const getAllUsers = async () => {
-    try {
-      const response = await apiClient.get('/user');
-      return response.data; // Accessing data directly
-    } catch (error) {
-      console.error('Failed to fetch users:', error);
-      return null; // Handle errors appropriately
-    }
-  };
-  
+// Function to fetch user information by email
+const getUserInfoByEmail = async (email: string) => {
+  try {
+    const response = await clientApi.get(`/user/email/${email}`);
+    return response.data; // Return the user data
+  } catch (error) {
+    console.error("Failed to fetch user:", error);
+    return null; // Handle errors appropriately
+  }
+};
 
-// const getAllUsers = async () => {
-//  return apiClient.get('/user')
-// }
+const updateUser = async (userDetails: any) => {
+  try {
+    const response = await clientApi.put(
+      `/user/${userDetails.email}`,
+      userDetails
+    );
+    return response;
+  } catch (error) {
+    console.error("Failed to update user:", error);
+    return null; // Handle errors appropriately
+  }
+};
 
-// const addUser = async (userJson: any) => {
-//     return apiClient.post('/user', userJson)
-// }
 export default {
-    getAllUsers,
-    addUser,
-    uploadImage,
-    userLogin
-}
+  addUser,
+  uploadImage,
+  userLogin,
+  getUserInfoByEmail,
+  updateUser,
+  updateImage,
+};

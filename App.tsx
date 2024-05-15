@@ -1,59 +1,109 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity,Button,Alert,TextInput,StatusBar} from 'react-native';
-import React,{useState, FC} from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import StudentListPage from './Components/StudentListPage';
-import AddStudentPage from './Components/StudentAddPage';
-import StudentDetailsPage from './Components/StudentDetailsPage';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import LoginPage from './Components/LoginPage';
-import PostsListPage from './Components/PostsListPage';
-import SignUpUserPage from './Components/UserSignUpPage';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  TouchableOpacity,
+  Button,
+  Alert,
+  TextInput,
+  StatusBar,
+} from "react-native";
+import React, { useState, FC, useEffect } from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { NativeBaseProvider } from "native-base";
+import * as SecureStorage from "./utility/secureStorage";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-
+import LoginPage from "./Components/LoginPage";
+import SignUpUserPage from "./Components/UserSignUpPage";
+import ProfilePage from "./Components/ProfilePage";
+import MainPage from "./Components/MainPage";
+import EditProfilePage from "./Components/EditProfilePage";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 const LoginStack = createNativeStackNavigator();
-
-const StudentsListScreen:FC= () => {
-  return (
-    <LoginStack.Navigator>
-      {/* <StudentListStack.Screen name="StudentListPage" component={StudentListPage} options={{title: "Student List"}}/>
-      <StudentListStack.Screen name="StudentDetailsPage" component={StudentDetailsPage} options={{title: "Student Details"}} />
-      <StudentListStack.Screen name="AddStudentPage" component={AddStudentPage} options={{title: "Add Student"}}/> */}
-      <LoginStack.Screen name="LoginPage" component={LoginPage} options={{title: "Login"}}/>
-      <LoginStack.Screen name="SignUpUserPage" component={SignUpUserPage} options={{title: "Sign-Up User"}}/>
-      <LoginStack.Screen name="PostsListPage" component={PostsListPage} options={{title: "Posts"}}/>
-    </LoginStack.Navigator>
-  );
-
-}
+const MainStack = createNativeStackNavigator();
 
 export default function App() {
- 
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const handleLogin = () => {
+    //TODO: Implement login logic
+    setIsLoggedIn(true);
+  };
+
+  const handleLogout = async () => {
+    //TODO: Implement logout logic
+    await SecureStorage.RemoveTokens();
+    await AsyncStorage.removeItem("userEmail");
+    setIsLoggedIn(false);
+  };
+
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      try {
+        const token = await AsyncStorage.getItem("accessToken");
+        if (token) {
+          setIsLoggedIn(true);
+        }
+      } catch (e) {
+        console.error("Failed to load the token.");
+      }
+    };
+
+    checkLoginStatus();
+  }, [isLoggedIn]);
+
   return (
-    <NavigationContainer>
-       {/* <Tab.Navigator>
-          <Tab.Screen name="StudentListPage" component={StudentsListScreen} options={{headerShown:false}} />
-          <Tab.Screen name="AddStudentPage" component={AddStudentPage} options={{title: "Add Student"}}/>
-        </Tab.Navigator> */}
-        <Tab.Navigator>
-          <Tab.Screen name="LoginPage" component={LoginPage} options={{headerShown:false}} />
-          <Tab.Screen name="SignUpUserPage" component={SignUpUserPage} options={{title: "Sign-Up User"}}/>
-        </Tab.Navigator>
-
-
-    </NavigationContainer>
-
+    <NativeBaseProvider>
+      <NavigationContainer>
+        <Stack.Navigator>
+          {isLoggedIn ? (
+            <>
+              <Stack.Screen name="MainPage" options={{ headerShown: false }}>
+                {(props) => <MainPage {...props} onLogout={handleLogout} />}
+              </Stack.Screen>
+              <Stack.Screen name="LoginPage" options={{ headerShown: false }}>
+                {(props) => <LoginPage {...props} onLogin={handleLogin} />}
+              </Stack.Screen>
+              <Stack.Screen
+                name="ProfilePage"
+                component={ProfilePage}
+                options={{ title: "Profile" }}
+              />
+              <Stack.Screen
+                name="EditProfile"
+                component={EditProfilePage}
+                options={{ title: "Edit Profile" }}
+              />
+            </>
+          ) : (
+            <>
+              <Stack.Screen name="LoginPage" options={{ headerShown: false }}>
+                {(props) => <LoginPage {...props} onLogin={handleLogin} />}
+              </Stack.Screen>
+              <Stack.Screen
+                name="SignUpUserPage"
+                component={SignUpUserPage}
+                options={{ title: "Sign Up" }}
+              />
+            </>
+          )}
+        </Stack.Navigator>
+      </NavigationContainer>
+    </NativeBaseProvider>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: 'column',
+    flexDirection: "column",
     marginTop: StatusBar.currentHeight,
   },
 });

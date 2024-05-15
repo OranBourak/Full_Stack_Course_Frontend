@@ -1,9 +1,8 @@
-import apiClient from "./ClientApi";
-
+import clientApi from "./ClientApi";
 
 const getAllPosts = async () => {
- return apiClient.get('/post')
-}
+  return clientApi.get("/post");
+};
 export default {
-    getAllPosts
-}
+  getAllPosts,
+};
