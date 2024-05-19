@@ -1,14 +1,4 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  TouchableOpacity,
-  Button,
-  Alert,
-  TextInput,
-  StatusBar,
-} from "react-native";
+import { StyleSheet, StatusBar } from "react-native";
 import React, { useState, FC, useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -22,23 +12,18 @@ import SignUpUserPage from "./Components/UserSignUpPage";
 import ProfilePage from "./Components/ProfilePage";
 import MainPage from "./Components/MainPage";
 import EditProfilePage from "./Components/EditProfilePage";
+import PostUploadScreen from "./Components/AddPostPage";
 
 const Stack = createNativeStackNavigator();
-const Tab = createBottomTabNavigator();
-
-const LoginStack = createNativeStackNavigator();
-const MainStack = createNativeStackNavigator();
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const handleLogin = () => {
-    //TODO: Implement login logic
     setIsLoggedIn(true);
   };
 
   const handleLogout = async () => {
-    //TODO: Implement logout logic
     await SecureStorage.RemoveTokens();
     await AsyncStorage.removeItem("userEmail");
     setIsLoggedIn(false);
@@ -80,6 +65,11 @@ export default function App() {
                 name="EditProfile"
                 component={EditProfilePage}
                 options={{ title: "Edit Profile" }}
+              />
+              <Stack.Screen
+                name="PostUploadScreen"
+                component={PostUploadScreen}
+                options={{ title: "Upload Post" }}
               />
             </>
           ) : (

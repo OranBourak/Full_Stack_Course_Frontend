@@ -1,7 +1,6 @@
 import React, { FC, useState, useEffect } from "react";
 import {
   View,
-  Button,
   TextInput,
   Text,
   StyleSheet,

@@ -1,36 +1,68 @@
 import React, { FC, useState, useEffect } from "react";
-import { VStack, Box, Text, HStack, IconButton, Center } from "native-base";
-import { Alert } from "react-native";
+import { Alert, FlatList } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { VStack, Box, Text, HStack, IconButton } from "native-base";
+import PostCard from "./PostCard"; // Adjust the import path as needed
+import { postApi } from "../api/PostApi";
+import UserApi from "../api/UserApi";
+import { Post } from "../Models/PostModel";
 
 const MainPage: FC<{ navigation: any; onLogout: any }> = ({
   navigation,
   onLogout,
 }) => {
   const [userName, setUserName] = useState<string | null>(null);
-  const [posts, setPosts] = useState<any[]>([]); // Replace 'any' with your post type
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [followedUsers, setFollowedUsers] = useState(new Set());
+  const [loggedUserId, setLoggedUserId] = useState<string | null>(null);
 
   useEffect(() => {
-    const loadUserName = async () => {
-      const storedUserName = await AsyncStorage.getItem("userName");
-      if (storedUserName !== null) {
+    const initializePage = async () => {
+      const storedUserName = await AsyncStorage.getItem("userEmail");
+      if (storedUserName) {
         setUserName(storedUserName);
       }
+      await fetchFollowedUsers();
+      await fetchPosts();
+      setLoggedUserId(await UserApi.getLoggedInUserId());
     };
-
-    loadUserName();
-    //TODO: Replace with your API call to fetch posts
+    initializePage();
   }, []);
 
+  const fetchFollowedUsers = async () => {
+    const userFollows: string[] =
+      (await UserApi.getFollowedUserIds()) as string[];
+    setFollowedUsers(new Set(userFollows));
+  };
+
   const fetchPosts = async () => {
-    //TODO: Your API call to fetch posts
+    try {
+      const response = await postApi.fetchPosts();
+      if (Array.isArray(response.data)) {
+        // Assuming the successful response is an array
+        setPosts(response.data);
+      } else {
+        // Handle scenarios when the response is not an array
+        console.error("API did not return an array:", response);
+        Alert.alert(
+          "Error",
+          "Failed to fetch posts due to unexpected data format."
+        );
+      }
+    } catch (error) {
+      console.error("Failed to fetch posts:", error);
+      Alert.alert(
+        "Error",
+        "Failed to fetch posts due to network or server error."
+      );
+    }
   };
 
   const handleLogout = async () => {
     Alert.alert(
-      "Confirm Logout", // Title of the alert
-      "Are you sure you want to log out?", // Message of the alert
+      "Confirm Logout",
+      "Are you sure you want to log out?",
       [
         {
           text: "Cancel",
@@ -45,7 +77,7 @@ const MainPage: FC<{ navigation: any; onLogout: any }> = ({
           },
         },
       ],
-      { cancelable: false } // This prevents tapping outside of the alert from closing it
+      { cancelable: false }
     );
   };
 
@@ -56,23 +88,25 @@ const MainPage: FC<{ navigation: any; onLogout: any }> = ({
         bg="primary.600"
         px="1"
         py="3"
-        justifyContent="space-between"
+        justifyContent="center"
         alignItems="center"
+        marginTop={-5}
       >
-        <HStack space="4" alignItems="center">
-          <Text color="white" fontSize="20" fontWeight="bold">
-            Welcome, {userName}!
-          </Text>
-        </HStack>
+        <Text color="white" fontSize="20" fontWeight="bold">
+          Welcome, {userName}!
+        </Text>
       </HStack>
-      <VStack space={4} flex={1}>
-        {/* Your content goes here, replace with your actual post components */}
-        {posts.map((post) => (
-          <Box key={post.id} p="5" shadow={2} bg="white">
-            <Text color="coolGray.800">{post.content}</Text>
-          </Box>
-        ))}
-      </VStack>
+      <FlatList
+        data={posts}
+        keyExtractor={(item: Post) => (item._id ? item._id.toString() : "")}
+        renderItem={({ item }) => (
+          <PostCard
+            post={item}
+            isFollowing={followedUsers.has(item.owner)}
+            userId={loggedUserId ?? ""}
+          />
+        )}
+      />
       <HStack
         bg="primary.600"
         px="1"
@@ -86,7 +120,7 @@ const MainPage: FC<{ navigation: any; onLogout: any }> = ({
         />
         <IconButton
           icon={<MaterialIcons name="add" size={24} color="white" />}
-          onPress={() => navigation.navigate("AddPostPage")}
+          onPress={() => navigation.navigate("PostUploadScreen")}
         />
         <IconButton
           icon={<MaterialIcons name="home" size={24} color="white" />}

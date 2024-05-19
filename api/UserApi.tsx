@@ -73,6 +73,55 @@ const updateUser = async (userDetails: any) => {
   }
 };
 
+const getLoggedInUserId = async () => {
+  try {
+    const response = await clientApi.get("/user/myId");
+    return (response.data as any).userId;
+  } catch (error) {
+    console.error("Failed to get logged in user ID:", error);
+    return null; // Handle errors appropriately
+  }
+};
+
+const unFollowUser = async (userId: string) => {
+  try {
+    const response = await clientApi.put(`/user/unfollow/${userId}`);
+    return response;
+  } catch (error) {
+    console.error("Failed to unfollow user:", error);
+    return null; // Handle errors appropriately
+  }
+};
+const followUser = async (userId: string) => {
+  try {
+    const response = await clientApi.put(`/user/follow/${userId}`);
+    return response;
+  } catch (error) {
+    console.error("Failed to follow user:", error);
+    return null; // Handle errors appropriately
+  }
+};
+
+const getUserInfoById = async (userId: string) => {
+  try {
+    const response = await clientApi.get(`/user/${userId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Failed to fetch user by ID:", error);
+    return null; // Handle errors appropriately
+  }
+};
+
+const getFollowedUserIds = async () => {
+  try {
+    const response = await clientApi.get("/user/following");
+    return response.data;
+  } catch (error) {
+    console.error("Failed to fetch followed users:", error);
+    return null; // Handle errors appropriately
+  }
+};
+
 export default {
   addUser,
   uploadImage,
@@ -80,4 +129,9 @@ export default {
   getUserInfoByEmail,
   updateUser,
   updateImage,
+  getLoggedInUserId,
+  unFollowUser,
+  followUser,
+  getUserInfoById,
+  getFollowedUserIds,
 };
