@@ -17,7 +17,7 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 const SignUpUserPage: FC<{ navigation: any }> = ({ navigation }) => {
   const [email, onChangeEmail] = useState("");
   const [password, onChangePassword] = useState("");
-  const [avatarUri, setAvatarUri] = useState("");
+  const [avatarUri, setAvatarUri] = useState("../assets/Avatar.jpg");
   const [userName, setUserName] = useState("");
 
   const emailRegex =
@@ -59,6 +59,7 @@ const SignUpUserPage: FC<{ navigation: any }> = ({ navigation }) => {
       if (!result.canceled && result.assets.length > 0) {
         const uri = result.assets[0].uri;
         setAvatarUri(uri);
+        console.log("URI: ", uri);
       }
     } catch (error) {
       console.log("Failed to open gallery: ", error);
@@ -99,10 +100,12 @@ const SignUpUserPage: FC<{ navigation: any }> = ({ navigation }) => {
     };
     try {
       console.log("Adding user to server: ", user);
-      if (avatarUri !== "") {
+      if (avatarUri !== "../assets/Avatar.jpg") {
         const url = await UserModel.uploadImage(avatarUri);
         console.log("Image uploaded to: ", url);
         user.imgUrl = url as string; // Type assertion to treat 'url' as string
+      } else {
+        user.imgUrl = "http://192.168.7.32:3000/uploads/Avatar.jpg";
       }
       const res = await UserModel.addUser(user);
       if (res) {
@@ -132,13 +135,13 @@ const SignUpUserPage: FC<{ navigation: any }> = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View>
-        {avatarUri == "" && (
+        {avatarUri == "../assets/Avatar.jpg" && (
           <Image
             source={require("../assets/Avatar.jpg")}
             style={styles.avatar}
           />
         )}
-        {avatarUri !== "" && (
+        {avatarUri !== "../assets/Avatar.jpg" && (
           <Image source={{ uri: avatarUri }} style={styles.avatar} />
         )}
         <TouchableOpacity onPress={openCamera}>

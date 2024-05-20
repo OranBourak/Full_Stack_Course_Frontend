@@ -13,6 +13,13 @@ import ProfilePage from "./Components/ProfilePage";
 import MainPage from "./Components/MainPage";
 import EditProfilePage from "./Components/EditProfilePage";
 import PostUploadScreen from "./Components/AddPostPage";
+import EditPostScreen from "./Components/EditPostScreen";
+import { LogBox } from "react-native";
+
+LogBox.ignoreLogs([
+  "In React 18, SSRProvider is not necessary and is a noop",
+  "source.uri should not be an empty string",
+]);
 
 const Stack = createNativeStackNavigator();
 
@@ -71,6 +78,11 @@ export default function App() {
                 component={PostUploadScreen}
                 options={{ title: "Upload Post" }}
               />
+              <Stack.Screen
+                name="EditPostScreen"
+                component={EditPostScreen}
+                options={{ title: "Edit Post" }}
+              />
             </>
           ) : (
             <>
@@ -89,11 +101,3 @@ export default function App() {
     </NativeBaseProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    flexDirection: "column",
-    marginTop: StatusBar.currentHeight,
-  },
-});

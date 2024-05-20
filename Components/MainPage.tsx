@@ -1,9 +1,9 @@
 import React, { FC, useState, useEffect } from "react";
-import { Alert, FlatList } from "react-native";
+import { Alert, FlatList, Switch } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { VStack, Box, Text, HStack, IconButton } from "native-base";
-import PostCard from "./PostCard"; // Adjust the import path as needed
+import PostCard from "./PostCard";
 import { postApi } from "../api/PostApi";
 import UserApi from "../api/UserApi";
 import { Post } from "../Models/PostModel";
@@ -16,6 +16,7 @@ const MainPage: FC<{ navigation: any; onLogout: any }> = ({
   const [posts, setPosts] = useState<Post[]>([]);
   const [followedUsers, setFollowedUsers] = useState(new Set());
   const [loggedUserId, setLoggedUserId] = useState<string | null>(null);
+  const [showOnlyMyPosts, setShowOnlyMyPosts] = useState(false);
 
   useEffect(() => {
     const initializePage = async () => {
@@ -30,6 +31,19 @@ const MainPage: FC<{ navigation: any; onLogout: any }> = ({
     initializePage();
   }, []);
 
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", () => {
+      // Fetch posts again when the page is focused
+      fetchPosts();
+    });
+
+    return unsubscribe;
+  }, [navigation, showOnlyMyPosts]);
+
+  useEffect(() => {
+    fetchPosts();
+  }, [showOnlyMyPosts]);
+
   const fetchFollowedUsers = async () => {
     const userFollows: string[] =
       (await UserApi.getFollowedUserIds()) as string[];
@@ -39,8 +53,15 @@ const MainPage: FC<{ navigation: any; onLogout: any }> = ({
   const fetchPosts = async () => {
     try {
       const response = await postApi.fetchPosts();
+
       if (Array.isArray(response.data)) {
-        // Assuming the successful response is an array
+        if (showOnlyMyPosts) {
+          const myPosts = response.data.filter(
+            (post: Post) => post.owner === loggedUserId
+          );
+          setPosts(myPosts);
+          return;
+        }
         setPosts(response.data);
       } else {
         // Handle scenarios when the response is not an array
@@ -81,6 +102,18 @@ const MainPage: FC<{ navigation: any; onLogout: any }> = ({
     );
   };
 
+  const handleFollowChange = async (userId: string) => {
+    if (followedUsers.has(userId)) {
+      await UserApi.unFollowUser(userId);
+      followedUsers.delete(userId);
+    } else {
+      await UserApi.followUser(userId);
+      followedUsers.add(userId);
+    }
+    // Update the state to trigger re-render
+    setFollowedUsers(new Set(followedUsers));
+  };
+
   return (
     <VStack space={4} flex={1}>
       <Box safeAreaTop bg="primary.600" />
@@ -96,6 +129,30 @@ const MainPage: FC<{ navigation: any; onLogout: any }> = ({
           Welcome, {userName}!
         </Text>
       </HStack>
+      <HStack
+        bg="primary.900"
+        px="4"
+        py="3"
+        justifyContent="space-between" // This spreads out the child components more evenly
+        alignItems="center"
+        height={"50px"}
+        marginTop={-5}
+      >
+        <Text color="white" fontSize="16">
+          {"All Posts"}
+        </Text>
+        <Switch
+          value={showOnlyMyPosts}
+          onValueChange={(value) => setShowOnlyMyPosts(value)}
+          trackColor={{ false: "#767577", true: "#81b0ff" }}
+          thumbColor={showOnlyMyPosts ? "#f4f3f4" : "#f4f3f4"}
+          ios_backgroundColor="#3e3e3e"
+          style={{ transform: [{ scaleX: 1.5 }, { scaleY: 1.5 }] }}
+        />
+        <Text color="white" fontSize="16">
+          {"My Posts"}
+        </Text>
+      </HStack>
       <FlatList
         data={posts}
         keyExtractor={(item: Post) => (item._id ? item._id.toString() : "")}
@@ -103,7 +160,10 @@ const MainPage: FC<{ navigation: any; onLogout: any }> = ({
           <PostCard
             post={item}
             isFollowing={followedUsers.has(item.owner)}
+            onFollowChange={() => handleFollowChange(item.owner)}
             userId={loggedUserId ?? ""}
+            canEdit={showOnlyMyPosts && item.owner === loggedUserId}
+            navigation={navigation}
           />
         )}
       />

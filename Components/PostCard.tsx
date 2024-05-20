@@ -37,14 +37,24 @@ const PostCard = ({
   post,
   isFollowing,
   userId,
+  onFollowChange,
+  canEdit,
+  navigation,
 }: {
   post: Post;
   isFollowing: boolean;
   userId: string;
+  onFollowChange: any;
+  canEdit: boolean;
+  navigation: any;
 }) => {
   const [liked, setLiked] = useState(false);
   const [following, setFollowing] = useState(isFollowing);
   const [postOwnerInfo, setPostOwnerInfo] = useState({ name: "", imgUrl: "" });
+
+  useEffect(() => {
+    setFollowing(isFollowing); // Update the following status when prop changes
+  }, [isFollowing]);
 
   useEffect(() => {
     const checkLikeStatus = async () => {
@@ -71,15 +81,15 @@ const PostCard = ({
     setLiked(!liked);
   };
 
-  const handleFollow = async (post: Post) => {
-    if (following) {
-      await UserApi.unFollowUser(post.owner);
-    } else {
-      await UserApi.followUser(post.owner);
-    }
+  const handleFollow = () => {
+    onFollowChange(); // Call the passed function from MainPage
     setFollowing(!following);
   };
 
+  const handleEdit = () => {
+    // Logic to navigate to the edit screen or open an edit modal
+    navigation.navigate("EditPostScreen", { post: post });
+  };
   return (
     <View style={styles.postCard}>
       <View style={styles.postHeader}>
@@ -93,7 +103,11 @@ const PostCard = ({
       <Text style={styles.postDescription}>{post.title}</Text>
       <Text style={styles.postMessage}>{post.message}</Text>
       {post.photo && (
-        <Image source={{ uri: post.photo }} style={styles.postImage} />
+        <Image
+          source={{ uri: post.photo }}
+          style={styles.postImage}
+          resizeMode="stretch"
+        />
       )}
       <View style={styles.postFooter}>
         <TouchableOpacity style={styles.postButton} onPress={handleLike}>
@@ -104,19 +118,24 @@ const PostCard = ({
           />
           <Text style={styles.postButtonText}>{liked ? "Unlike" : "Like"}</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.postButton}
-          onPress={() => handleFollow(post)}
-        >
-          <MaterialIcons
-            name={following ? "person" : "person-add"}
-            size={24}
-            color={following ? "green" : "grey"}
-          />
-          <Text style={styles.postButtonText}>
-            {following ? "Unfollow" : "Follow"}
-          </Text>
-        </TouchableOpacity>
+        {post.owner !== userId && ( // Conditionally render follow button
+          <TouchableOpacity style={styles.postButton} onPress={handleFollow}>
+            <MaterialIcons
+              name={following ? "person" : "person-add"}
+              size={24}
+              color={following ? "green" : "grey"}
+            />
+            <Text style={styles.postButtonText}>
+              {following ? "Unfollow" : "Follow"}
+            </Text>
+          </TouchableOpacity>
+        )}
+        {canEdit && (
+          <TouchableOpacity style={styles.editButton} onPress={handleEdit}>
+            <MaterialIcons name="edit" size={24} color="black" />
+            <Text style={styles.editButtonText}>Edit</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );
@@ -167,7 +186,7 @@ const styles = StyleSheet.create({
   },
   postImage: {
     width: "100%",
-    height: 200,
+    height: 250,
     borderRadius: 5,
     marginBottom: 10,
   },
@@ -188,6 +207,20 @@ const styles = StyleSheet.create({
     marginLeft: 5,
     fontSize: 14,
     color: "#666",
+  },
+  editButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 5,
+    backgroundColor: "#e0e0e0", // Light gray background for a subtle look
+    marginVertical: 10,
+  },
+  editButtonText: {
+    marginLeft: 5,
+    fontSize: 14,
+    color: "#333", // Dark text for better readability
   },
 });
 

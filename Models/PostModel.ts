@@ -62,8 +62,8 @@ const updatePost = async (postId: string, post: Post) => {
     const newfilename = await uploadPostImage(post.photo);
     post.photo = newfilename || ""; // Provide a default value for post.photo in case newfilename is undefined
   }
-  const response = await postApi.updatePost(postId, post);
+  const response = await postApi.updatePost(post);
   return response;
 };
 
-export default { getAllPosts, addPost, updatePost };
+export default { getAllPosts, addPost, updatePost, uploadPostImage };

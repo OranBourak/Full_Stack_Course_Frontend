@@ -17,11 +17,8 @@ export const postApi = {
   deletePost: async (postId: string) => {
     return clientApi.delete(`/post/${postId}`);
   },
-  updatePost: async (
-    postId: string,
-    data: { message?: string; photo?: string }
-  ) => {
-    return clientApi.put(`/post/${postId}`, data);
+  updatePost: async (post: Post) => {
+    return clientApi.put(`/post/${post._id}`, post);
   },
   getAllUserPosts: async (userId: string) => {
     return clientApi.get(`/post/user/${userId}`);
@@ -32,6 +29,12 @@ export const postApi = {
       headers: {
         "Content-Type": "multipart/form-data",
       },
+    });
+  },
+  removePostImage: async (imageURL: string) => {
+    console.log("Removing image:", imageURL);
+    return clientApi.put(`/file/postImageRemove`, {
+      data: { url: imageURL },
     });
   },
 };
