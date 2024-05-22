@@ -1,6 +1,7 @@
 {
   "expo": {
     "scheme": "com.oran.fullstackcourse",
+    "plugins": ["@react-native-google-signin/google-signin"],
     "name": "sce_front",
     "slug": "sce_front",
     "version": "1.0.0",
@@ -12,9 +13,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
     },

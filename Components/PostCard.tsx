@@ -93,10 +93,12 @@ const PostCard = ({
   return (
     <View style={styles.postCard}>
       <View style={styles.postHeader}>
-        <Image
-          source={{ uri: postOwnerInfo.imgUrl }}
-          style={styles.postAvatar}
-        />
+        {postOwnerInfo.imgUrl && (
+          <Image
+            source={{ uri: postOwnerInfo.imgUrl }}
+            style={styles.postAvatar}
+          />
+        )}
         <Text style={styles.postUsername}>{postOwnerInfo.name}</Text>
         <Text style={styles.postDate}>{formatDate(post.updatedAt)}</Text>
       </View>

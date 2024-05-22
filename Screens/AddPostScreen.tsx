@@ -97,7 +97,11 @@ const PostUploadScreen: FC<{ navigation: any }> = ({ navigation }) => {
         />
         <Text>{statusMessage}</Text>
         {post.photo && (
-          <Image source={{ uri: post.photo }} style={styles.preview} />
+          <Image
+            source={{ uri: post.photo }}
+            style={styles.preview}
+            resizeMode="stretch"
+          />
         )}
         <View style={styles.buttonContainer}>
           <Button title="Choose Photo" onPress={openGallery} />

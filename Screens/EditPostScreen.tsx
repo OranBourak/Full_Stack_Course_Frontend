@@ -118,11 +118,13 @@ const EditPostScreen = ({ route, navigation }: any) => {
           <View>
             <Text style={styles.title}>Image</Text>
             <View style={styles.input}>
-              <Image
-                source={{ uri: editedPost.photo }}
-                style={styles.image}
-                resizeMode="stretch"
-              />
+              {editedPost.photo && (
+                <Image
+                  source={{ uri: editedPost.photo }}
+                  style={styles.image}
+                  resizeMode="stretch"
+                />
+              )}
               <Button
                 title="Remove Photo"
                 onPress={removeImage}

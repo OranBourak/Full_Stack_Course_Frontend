@@ -6,7 +6,7 @@ export type Post = {
   message: string;
   owner: string;
   likes?: string[];
-  photo?: string;
+  photo: string;
   updatedAt?: Date;
 };
 

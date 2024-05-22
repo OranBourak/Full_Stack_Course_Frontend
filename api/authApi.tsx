@@ -55,6 +55,7 @@ export const authApi = {
     console.log("Attempting to log out user");
     try {
       const response = await clientApi.post("/auth/logout", data);
+      console.log("Logout successful:", response.data);
       await RemoveTokens();
       clientApi.deleteHeader("Authorization");
       return response;

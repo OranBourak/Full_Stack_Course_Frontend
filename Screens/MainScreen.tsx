@@ -3,10 +3,13 @@ import { Alert, FlatList, Switch } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { VStack, Box, Text, HStack, IconButton } from "native-base";
-import PostCard from "./PostCard";
+import PostCard from "../Components/PostCard";
 import { postApi } from "../api/PostApi";
 import UserApi from "../api/UserApi";
 import { Post } from "../Models/PostModel";
+import { authApi } from "../api/authApi";
+import { getRefreshToken } from "../utility/secureStorage";
+import { useFocusEffect } from "@react-navigation/native";
 
 const MainPage: FC<{ navigation: any; onLogout: any }> = ({
   navigation,
@@ -39,6 +42,13 @@ const MainPage: FC<{ navigation: any; onLogout: any }> = ({
 
     return unsubscribe;
   }, [navigation, showOnlyMyPosts]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchPosts(); // Fetch posts when the page is focused
+      return () => {};
+    }, [showOnlyMyPosts])
+  );
 
   useEffect(() => {
     fetchPosts();
@@ -94,6 +104,10 @@ const MainPage: FC<{ navigation: any; onLogout: any }> = ({
           text: "Logout",
           onPress: async () => {
             onLogout();
+            const refreshToken = await getRefreshToken();
+            console.log("Logging out with refresh token:", refreshToken);
+            await authApi.logout({ refreshToken });
+
             navigation.navigate("LoginPage");
           },
         },
@@ -125,15 +139,15 @@ const MainPage: FC<{ navigation: any; onLogout: any }> = ({
         alignItems="center"
         marginTop={-5}
       >
-        <Text color="white" fontSize="20" fontWeight="bold">
+        {/* <Text color="white" fontSize="20" fontWeight="bold">
           Welcome, {userName}!
-        </Text>
+        </Text> */}
       </HStack>
       <HStack
         bg="primary.900"
         px="4"
         py="3"
-        justifyContent="space-between" // This spreads out the child components more evenly
+        justifyContent="space-between"
         alignItems="center"
         height={"50px"}
         marginTop={-5}

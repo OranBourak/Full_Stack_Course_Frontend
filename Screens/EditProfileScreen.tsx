@@ -124,14 +124,14 @@ const EditProfilePage = () => {
   return (
     <View style={styles.container}>
       <View style={styles.avatarContainer}>
-        <Image
-          style={styles.avatar}
-          source={{
-            uri:
-              avatar ||
-              "https://www.bootdey.com/img/Content/avatar/avatar1.png",
-          }}
-        />
+        {avatar && (
+          <Image
+            style={styles.avatar}
+            source={{
+              uri: avatar,
+            }}
+          />
+        )}
         <TouchableOpacity onPress={openCamera}>
           <Ionicons name="camera" style={styles.cameraButton} size={40} />
         </TouchableOpacity>

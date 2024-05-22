@@ -4,7 +4,6 @@ import {
   View,
   Image,
   TouchableOpacity,
-  Button,
   Alert,
   TextInput,
   StatusBar,
@@ -141,7 +140,7 @@ const SignUpUserPage: FC<{ navigation: any }> = ({ navigation }) => {
             style={styles.avatar}
           />
         )}
-        {avatarUri !== "../assets/Avatar.jpg" && (
+        {avatarUri !== "../assets/Avatar.jpg" && avatarUri && (
           <Image source={{ uri: avatarUri }} style={styles.avatar} />
         )}
         <TouchableOpacity onPress={openCamera}>

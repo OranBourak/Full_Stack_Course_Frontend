@@ -76,14 +76,14 @@ const ProfilePage: FC<{ navigation: any }> = ({ navigation }) => {
     <ScrollView style={styles.container}>
       <View style={styles.headerContainer}>
         <View style={styles.profileContainer}>
-          <Image
-            style={styles.profilePhoto}
-            source={{
-              uri:
-                profileImage ||
-                "https://www.bootdey.com/img/Content/avatar/avatar1.png",
-            }}
-          />
+          {profileImage && (
+            <Image
+              style={styles.profilePhoto}
+              source={{
+                uri: profileImage,
+              }}
+            />
+          )}
           <Text style={styles.nameText}>{userName}</Text>
           <Text style={styles.nameText}>{email}</Text>
         </View>

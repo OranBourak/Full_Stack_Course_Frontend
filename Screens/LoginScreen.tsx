@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import {
   ResponseType,
@@ -25,12 +26,10 @@ const discovery = {
   revocationEndpoint: "https://oauth2.googleapis.com/revoke",
 };
 
-const LoginPage: FC<{ navigation: any; onLogin: any }> = ({
-  navigation,
-  onLogin,
-}) => {
+const LoginPage: FC<{ navigation: any }> = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(true);
 
   // Configure the Google auth request
   const [request, response, promptAsync] = useAuthRequest(
@@ -52,6 +51,25 @@ const LoginPage: FC<{ navigation: any; onLogin: any }> = ({
     }
   }, [response]);
 
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      try {
+        const token = await SecureStorage.getAccessToken();
+        if (token) {
+          clientApi.setHeader("Authorization", `Bearer ${token}`);
+          navigation.navigate("MainPage");
+          setLoading(false);
+        } else {
+          setLoading(false);
+        }
+      } catch (e) {
+        console.error("Failed to load the token.");
+        setLoading(false);
+      }
+    };
+    checkLoginStatus();
+  }, []);
+
   const handleGoogleAuthentication = async (authentication: any) => {
     try {
       const backendResponse = await clientApi.post<{
@@ -61,9 +79,8 @@ const LoginPage: FC<{ navigation: any; onLogin: any }> = ({
         id_token: authentication.idToken,
       });
 
-      if (backendResponse.ok && backendResponse.data) {
-        const { accessToken, refreshToken } = backendResponse.data;
-        storeTokensAndNavigate(accessToken, refreshToken, email);
+      if (backendResponse.ok) {
+        storeEmailAndNavigate(email);
       } else {
         Alert.alert("Login Failed", "Unable to log in with Google");
       }
@@ -85,12 +102,8 @@ const LoginPage: FC<{ navigation: any; onLogin: any }> = ({
     try {
       const userDetails = { email, password };
       const result = await authApi.login(userDetails);
-      if (result.ok && result.data) {
-        const { accessToken, refreshToken } = result.data as {
-          accessToken: string;
-          refreshToken: string;
-        };
-        storeTokensAndNavigate(accessToken, refreshToken, email);
+      if (result.ok) {
+        storeEmailAndNavigate(email);
       } else {
         Alert.alert("Error", "Failed to log in");
       }
@@ -100,36 +113,27 @@ const LoginPage: FC<{ navigation: any; onLogin: any }> = ({
     }
   };
 
-  const storeTokensAndNavigate = async (
-    accessToken: string,
-    refreshToken: string,
-    email: string
-  ) => {
+  const storeEmailAndNavigate = async (email: string) => {
     try {
-      await SecureStorage.secureTokens(accessToken, refreshToken);
       await AsyncStorage.setItem("userEmail", email);
-
-      const savedAccessToken = await SecureStorage.getAccessToken();
-      const savedRefreshToken = await SecureStorage.getRefreshToken();
-
-      console.log(
-        "tokens saved: " +
-          "AccessToken: " +
-          savedAccessToken +
-          ", Refresh Token: " +
-          savedRefreshToken
-      );
 
       setEmail("");
       setPassword("");
 
       Alert.alert("Success", "Logged in successfully");
-      onLogin(true);
-      navigation.navigate("MainPage"); // Navigate to the main screen or dashboard
+      navigation.navigate("MainPage");
     } catch (e) {
       Alert.alert("Error", "Failed to save tokens");
     }
   };
+
+  if (loading) {
+    return (
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -177,6 +181,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: 20,
+    backgroundColor: "#f5f5f5",
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
     backgroundColor: "#f5f5f5",
   },
   welcomeMessage: {
